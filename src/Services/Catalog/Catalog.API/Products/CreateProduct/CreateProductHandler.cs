@@ -1,16 +1,28 @@
-﻿using MediatR;
+﻿using BuildingBlocks.CQRS;
+using Catalog.API.Models;
+using MediatR;
 
 namespace Catalog.API.Products.CreateProduct;
-
-public record CreateProductCommand(string Name, List<string> Category, string Description, string ImageFile, decimal Prices)
-    : IRequest<CreateProductResult>;
-
 public record CreateProductResult(Guid id);
 
-internal class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, CreateProductResult>
+public record CreateProductCommand(string Name, List<string> Category, string Description, string ImageFile, decimal Price)
+    : ICommand<CreateProductResult>;
+
+internal class CreateProductCommandHandler
+        : ICommandHandler<CreateProductCommand, CreateProductResult>
 {
-    public Task<CreateProductResult> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var product = new Product
+        {
+            Name = command.Name,
+            Category = command.Category,
+            Description = command.Description,
+            ImageFile = command.ImageFile,
+            Price = command.Price
+        };
+
+        return new CreateProductResult(Guid.NewGuid());
     }
 }
+
